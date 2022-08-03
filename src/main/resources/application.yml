@@ -1,14 +1,21 @@
 server:
   port: 8080
 spring:
-  redis:
-    port: 6379
-    password: 123456
-    database: 0
-    host: 127.0.0.1
   application:
     #应用的名称
     name: reggie_take_out
+    #Redis相关配置
+  redis:
+      host: localhost
+      port: 6379
+      database: 0 #操作的是0号数据库
+      jedis:
+        #Redis连接池配置
+        pool:
+          max-active: 8 #最大连接数
+          max-wait: 1ms #连接池最大阻塞等待时间
+          max-idle: 4 #连接池中的最大空闲连接
+          min-idle: 0 #连接池中的最小空闲连接
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
@@ -24,4 +31,5 @@ mybatis-plus:
     db-config:
       #主键的生成策略(使用雪花算法自动生成主键)
       id-type: ASSIGN_ID
+reggie:
   path: D:\img\

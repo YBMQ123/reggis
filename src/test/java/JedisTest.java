@@ -1,26 +1,20 @@
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import redis.clients.jedis.Jedis;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+@SpringBootTest
 public class JedisTest {
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
     @Test
-    public void testRedis(){
-        //1.获取连接
-        Jedis jedis=new Jedis("localhost",6379);
-        //2.执行具体的操作
-        jedis.set("password","12345");
-        jedis.hset("hash1","age","20");
-//        jedis.del("username");
-        System.out.println(jedis.get("password"));
-        String hget = jedis.hget("hash1", "age");
-        System.out.println(hget);
-        Set<String> keys = jedis.keys("*");
-        for (String key : keys) {
-            System.out.println(key);
-        }
-        //关闭连接
-        jedis.close();
+    public void testRedis() {
+        stringRedisTemplate.opsForValue().set("name","10",30, TimeUnit.SECONDS);
+
     }
 }

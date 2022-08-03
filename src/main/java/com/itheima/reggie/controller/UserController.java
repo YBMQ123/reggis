@@ -11,6 +11,8 @@ import com.itheima.reggie.utils.ValidateCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.HttpSessionRequiredException;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +24,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/user")
@@ -29,6 +32,8 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     /**
      * 发送验证码到用户的手机
@@ -44,8 +49,10 @@ public class UserController {
             //生成四位的验证码
             String MessageCode = String.valueOf(ValidateCodeUtils.generateValidateCode(4));
             //将生成的验证码保存到session里面
-            session.setAttribute(phone,MessageCode);
+//            session.setAttribute(phone,MessageCode);
             log.info("收到的验证码为{}",MessageCode);
+            //将生成的验证码保存在redis中，设置5分钟后自动删除
+            redisTemplate.opsForValue().set(phone,MessageCode);
 //            //调用腾讯云发送短信
 //            try {
 //                MessageUtil.senMessage(phone,MessageCode);
@@ -72,8 +79,10 @@ public class UserController {
         String phone = (String) map.get("phone");
         //获取前台传来用户输入的验证码
         String code = (String) map.get("code");
-        //获取保存在session中正确生成的验证码
-        String rightCode = (String) session.getAttribute(phone);
+//        //获取保存在session中正确生成的验证码
+//        String rightCode = (String) session.getAttribute(phone);
+        //获取保存在redis中的验证码
+        Object rightCode = redisTemplate.opsForValue().get(phone);
         System.out.println("正确的验证码"+rightCode);
         System.out.println("输入的验证码"+code);
         if (code.equals(rightCode)){
@@ -89,6 +98,8 @@ public class UserController {
                 userService.save(user);
             }
             session.setAttribute("user",user.getId());
+            //登入成功删除redis保存的验证码
+//            redisTemplate.delete(phone);
             return R.success(user);
         }
         throw new CustomException("输入的验证码错误");
