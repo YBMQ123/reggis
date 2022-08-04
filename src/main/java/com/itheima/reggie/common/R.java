@@ -1,11 +1,14 @@
 package com.itheima.reggie.common;
 
 import lombok.Data;
+
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 //通用的返回结果，服务端响应的数据都会封装成此对象
 @Data
-public class R<T> {
+//implements Serializable 实现序列化接口，才能把返回的数据保存在redis中
+public class R<T> implements Serializable {
 
     private Integer code; //编码：1成功，0和其它数字为失败
 

@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +39,10 @@ public class SetmealController {
      * @param setmealDto
      * @return
      */
+    //当进行新增一个套餐的时候，删除所有的缓存
+//    value = "setmealCache"：删除缓存名称为这一类的缓存
+//    allEntries = true：删除所有的缓存
+    @CacheEvict(value = "setmealCache",allEntries = true)
     @PostMapping
     public R<String> save(@RequestBody SetmealDto setmealDto){
         setmealService.saveWithDish(setmealDto);
@@ -119,6 +124,10 @@ public class SetmealController {
      * @return
      */
     @PutMapping
+    //当进行修改某一个套餐的时候，删除所有的缓存
+//    value = "setmealCache"：删除缓存名称为这一类的缓存
+//    allEntries = true：删除所有的缓存
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public R<String> update(@RequestBody SetmealDto setmealDto){
         setmealService.updateById(setmealDto);
         return R.success("修改成功");
@@ -153,6 +162,10 @@ public class SetmealController {
      * @return
      */
     @DeleteMapping("/{ids}")
+    //当进行删除某一个套餐的时候，删除所有的缓存
+//    value = "setmealCache"：删除缓存名称为这一类的缓存
+//    allEntries = true：删除所有的缓存
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public R<String> deleteById(@PathVariable String ids){
         if (ids.contains(",")) {
             String[] split = ids.split(",");
@@ -174,6 +187,10 @@ public class SetmealController {
     }
 
     @GetMapping("/list")
+    //将返回的数据缓存到redis中
+//    value = "setmealCache"设置缓存的名称
+//    key = "#setmeal.categoryId+'_'+#setmeal.status":设置缓存的键
+    @Cacheable(value = "setmealCache",key = "#setmeal.categoryId+'_'+#setmeal.status")
     public R<List<Setmeal>> list(Setmeal setmeal){
         //获取当前套餐的id
         Long categoryId = setmeal.getCategoryId();

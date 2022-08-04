@@ -27,7 +27,7 @@
 <!--            <artifactId>aliyun-java-sdk-dysmsapi</artifactId>-->
 <!--            <version>2.1.0</version>-->
 <!--        </dependency>-->
-
+<!--腾讯云的短信的发送服务依赖-->
         <dependency>
             <groupId>com.github.qcloudsms</groupId>
             <artifactId>qcloudsms</artifactId>
@@ -39,6 +39,11 @@
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>2.8.0</version>
+        </dependency>
+<!--Spingcache的依赖  -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
 <!--    Spring Data Redis的依赖-->
         <dependency>
